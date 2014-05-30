@@ -3,7 +3,7 @@ Created on May 29, 2014
 
 @author: Nathan Shearer
 '''
-import Eric_Prutt_rsync as rsync
+from rsync_usb import Eric_Prutt_rsync as rsync
 from StringIO import StringIO
 
 target = StringIO('ABCDEFGHIJKLM OPQRSTUVWXYZ') # No N
