@@ -3,6 +3,8 @@ Rsync Over USB
 
 An implementation of the Rsync protocol that can be used with offline storage when two hosts are not connected by a network.
 
+![Copying files from server to server with a USB drive](docs/diagram.png)
+
 Summary
 -------
 
