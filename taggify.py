@@ -42,7 +42,7 @@ if __name__ == '__main__':
     # Do Replacements
 
     replace_version('setup.py', version)
-    replace_version('ursync.py', version)
+    replace_version('rsync_usb/version.py', version)
 
     # Finished
     print ""

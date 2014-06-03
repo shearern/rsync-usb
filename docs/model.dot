@@ -1,0 +1,9 @@
+digraph model {
+    source_folder [shape=tab,label="Source"];
+    target_folder [shape=tab,label="Target"];
+
+    FileSet [shape=record, label="{ FileSet() | <add> .add(file_obj) | <has> .has(file_obj) | <union> .union(file_set) | <files_not_in_this_set> .files_not_in_this_set(file_set)  | <files_not_in_other_set> .files_not_in_other_set(file_set) }"];
+
+    find_files [shape=box,label="ftree.find_files()"];
+    target_folder -> find_files -> FileSet;
+}
