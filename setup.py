@@ -29,7 +29,7 @@ setup(name='python-rsync-usb',
 
     scripts=['src/ursync.py'],
     package_dir= {'': 'src'},
-    packages=['rsync_usb'],
+    packages=['rsync_usb', 'rsync_usb.ui', 'rsync_usb.trx_files'],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
