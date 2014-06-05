@@ -1,23 +1,8 @@
-import zlib
 import cPickle
 
 from abc import ABCMeta, abstractmethod
 
-class CompressedFileWriter(object):
-    def __init__(self, path):
-        self.__path = path
-        self.__fh = open(path, 'wb')
-        self.__compress = zlib.compressobj()
-
-    def write(self, data):
-        compressed = self.__compress.compress(data)
-        self.__fh.write(compressed)
-
-    def close(self):
-        self.__fh.write(self.__compress.flush())
-        self.__fh = None
-        self.__compress = None
-
+from CompressedFileWriter import CompressedFileWriter
 
 class TrxWriterBase(object):
     '''Base class for writing dicts of info to file'''
