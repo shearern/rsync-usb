@@ -94,7 +94,7 @@ class CompressedFileWriterTests(unittest.TestCase):
 
     def testMixedReadAndReadlineAscii(self):
         source = ''
-        for i in range(10):
+        for i in range(5):
             source += "\n"
             source += ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(4096))
 
@@ -106,7 +106,12 @@ class CompressedFileWriterTests(unittest.TestCase):
 
         compressed_file.seek(0)
         cfr = CompressedFileReader(compressed_file)
-        decompressed = "".join(list(cfr.readlines()))
+        decompressed = ""
+        while not cfr.eof:
+            if random.choice(['read', 'readline']) == 'read()':
+                decompressed += cfr.read(4096)
+            else:
+                decompressed += cfr.readline()
 
         for i in range(min(len(source), len(decompressed))):
             msg = "Source byte Byte %d not equal (source: %s, decomp: %s)"
@@ -118,7 +123,7 @@ class CompressedFileWriterTests(unittest.TestCase):
 
     def testMixedReadAndReadlineBinary(self):
         source = ''
-        for i in range(10):
+        for i in range(5):
             source += "\n"
             source += ''.join(chr(random.randrange(0, 255)) for _ in range(4096))
 
@@ -130,7 +135,12 @@ class CompressedFileWriterTests(unittest.TestCase):
 
         compressed_file.seek(0)
         cfr = CompressedFileReader(compressed_file)
-        decompressed = "".join(list(cfr.readlines()))
+        decompressed = ''
+        while not cfr.eof:
+            if random.choice(['read', 'readline']) == 'read()':
+                decompressed += cfr.read(4096)
+            else:
+                decompressed += cfr.readline()
 
         for i in range(min(len(source), len(decompressed))):
             msg = "Source byte Byte %d not equal (source: %d, decomp: %d)"

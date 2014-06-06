@@ -62,7 +62,7 @@ class CompressedFileReader(object):
         if pos == -1:
             return data
         else:
-            self.__decompressed_buffer = data[pos+1:]
+            self.__decompressed_buffer = data[pos+1:] + self.__decompressed_buffer
             return data[:pos+1]
 
 
@@ -77,7 +77,7 @@ class CompressedFileReader(object):
 
     @property
     def eof(self):
-        return self.__fh is None
+        return self.__fh is None and len(self.__decompressed_buffer) == 0
 
 
 

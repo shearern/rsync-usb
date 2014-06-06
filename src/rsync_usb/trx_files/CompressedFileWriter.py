@@ -15,7 +15,8 @@ class CompressedFileWriter(object):
 
 
     def close(self):
-        self.__fh.write(self.__compress.flush())
+        compressed = self.__compress.flush()
+        self.__fh.write(compressed)
         self.__fh = None
         self.__compress = None
 
