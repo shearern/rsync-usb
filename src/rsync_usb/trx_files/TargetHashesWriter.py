@@ -37,13 +37,12 @@ class TargetHashesWriter(TrxWriterBase):
     FC_STRONG_HASH = 's'
     FC_CHUNK_SIZE = 'z'              # Not stored if equal to block size
 
-    def __init__(self, path):
+    def __init__(self, file_handle):
         '''Init
 
-        @param path: Path to file to store hash data
-        @param mode: Read or Write
+        @param file_handle: File to write data to
         '''
-        super(TargetHashesWriter, self).__init__(path)
+        super(TargetHashesWriter, self).__init__(file_handle)
         self.__block_size = None
 
         # State
@@ -60,7 +59,7 @@ class TargetHashesWriter(TrxWriterBase):
             raise TargetHashProtocolError("Header written twice")
 
         # Output
-        ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        ts = self.datetime_to_save(datetime.now())
         data = {
             self.HK_FROM_HOST:          from_host,
             self.HK_CREATED_AT:         ts,

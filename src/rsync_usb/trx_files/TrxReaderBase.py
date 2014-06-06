@@ -1,5 +1,6 @@
 import os
 import cPickle
+from datetime import datetime
 
 from abc import ABCMeta, abstractmethod
 from TrxWriterBase import TrxWriterBase
@@ -29,11 +30,8 @@ class TrxReaderBase(object):
     '''
     __metaclass__ = ABCMeta
 
-    def __init__(self, path):
-        if not os.path.exists(path):
-            raise Exception("Trx File Not Found: " + path)
-        self.__path = path
-        self.__fh = CompressedFileReader(path)
+    def __init__(self, file_handle):
+        self.__fh = CompressedFileReader(file_handle)
         self.__instruct = self._get_decode_instructions()
         self.__depickler = cPickle.Unpickler(self.__fh)
         self.__depickler.find_global = None # Prevent depickling objects
@@ -120,6 +118,17 @@ class TrxReaderBase(object):
                                    data_type))
 
 
+    def all(self):
+        try:
+            for data in self:
+                if data is None:
+                    return
+                yield data
+        except EOFError:
+            return
+
+
+
     def _intperet_data(self, data_type, data):
         '''Convert data dict into whatever format is desired'''
         return data
@@ -152,5 +161,10 @@ class TrxReaderBase(object):
         '''Convert data dict into whatever format is desired'''
         return data
 
+
+    def interpret_datetime(self, strval):
+        if strval == 'None':
+            return None
+        return datetime.strptime(strval, TrxWriterBase.DT_FORMAT)
 
 

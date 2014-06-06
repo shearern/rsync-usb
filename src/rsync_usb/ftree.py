@@ -38,13 +38,15 @@ class DiskObjInfo(object):
 
 class FileInfo(DiskObjInfo):
     '''Hold basic information about a file'''
+    
+    TYPE_FLAG = 'F'
 
     def __init__(self, rel_path, path_on_disk=None):
         if rel_path[-1] == '/':
             raise Exception("File path should not end in '/'")
-        if path_on_disk is not None:
-            if not os.path.isfile(path_on_disk):
-                raise Exception("Not a file: " + path_on_disk)
+#        if path_on_disk is not None:
+#            if not os.path.isfile(path_on_disk):
+#                raise Exception("Not a file: " + path_on_disk)
         super(FileInfo, self).__init__(rel_path, path_on_disk)
 
 
@@ -54,21 +56,23 @@ class FileInfo(DiskObjInfo):
     @property
     def is_dir(self):
         return False
-    
+
     @property
     def fileobj_type(self):
-        return 'F'
+        return self.TYPE_FLAG
 
 
 class DirInfo(DiskObjInfo):
     '''Hold basic information about a directory'''
+    
+    TYPE_FLAG = 'D'
 
     def __init__(self, rel_path, path_on_disk=None):
         if rel_path[-1] != '/':
             raise Exception("Dir path should end in '/'")
-        if path_on_disk is not None:
-            if not os.path.isdir(path_on_disk):
-                raise Exception("Not a dir: " + path_on_disk)
+#        if path_on_disk is not None:
+#            if not os.path.isdir(path_on_disk):
+#                raise Exception("Not a dir: " + path_on_disk)
         super(DirInfo, self).__init__(rel_path, path_on_disk)
 
 
@@ -81,7 +85,7 @@ class DirInfo(DiskObjInfo):
 
     @property
     def fileobj_type(self):
-        return 'D'
+        return self.TYPE_FLAG
 
 
 def find_files_for_sync(root_path):

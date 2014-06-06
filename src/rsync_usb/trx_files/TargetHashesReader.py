@@ -1,7 +1,7 @@
 from TargetHashesWriter import TargetHashesWriter as THW
 
 from TrxReaderBase import TrxReaderBase
-
+from rsync_usb.ftree import DirInfo, FileInfo
 
 class TargetHashesFileHeader(object):
     '''Hold data from target hashes file header'''
@@ -24,7 +24,7 @@ class TargetHashesFile(object):
         self.scan_header = None
 
         self.path = None
-        self.fileobj_type = None
+        self._fileobj_type = None
 
         self.file_obj = None
 
@@ -60,12 +60,12 @@ class TargetHashesChunk(object):
 class TargetHashesReader(TrxReaderBase):
     '''Read back hashes from target system'''
 
-    def __init__(self, path):
+    def __init__(self, file_handle):
         self.__scan_header = None
         self.__last_file_header = None
         self.__last_file_chunk = None
 
-        super(TargetHashesReader, self).__init__(path)
+        super(TargetHashesReader, self).__init__(file_handle)
 
 
     def _intperet_data(self, data_type, data):
@@ -98,7 +98,7 @@ class TargetHashesReader(TrxReaderBase):
                 'class':      TargetHashesFile,
                 'map': {
                     THW.FK_PATH:                'path',
-                    THW.FK_TYPE:                'fileobj_type',
+                    THW.FK_TYPE:                '_fileobj_type',
                     },
                 'defaults': {
                     },
@@ -122,10 +122,17 @@ class TargetHashesReader(TrxReaderBase):
         '''Convert data dict into whatever format is desired'''
         if data_type == THW.HEADER_TYPE:
             self.__scan_header = data
+            data.created_at = self.interpret_datetime(data.created_at)
+
         elif data_type == THW.FILE_HEADER_TYPE:
             data.scan_header = self.__scan_header
             self.__last_file_header = data
             self.__last_file_chunk = None
+            if data._fileobj_type == DirInfo.TYPE_FLAG:
+                data.file_obj = DirInfo(data.path)
+            elif data._fileobj_type == FileInfo.TYPE_FLAG:
+                data.file_obj = FileInfo(data.path)
+
         elif data_type == THW.CHUNK_HASH_TYPE:
             data.scan_header = self.__scan_header
             data.file_header = self.__last_file_header

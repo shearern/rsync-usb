@@ -10,14 +10,15 @@ class TrxWriterBase(object):
 
     K_TYPE = 'T'
 
-    def __init__(self, path):
-        self.__path = path
-        self.__fh = CompressedFileWriter(path)
+    DT_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+    def __init__(self, file_handle):
+        self.__fh = CompressedFileWriter(file_handle)
 
 
     def __del__(self):
         if self.__fh is not None:
-            print "ERROR: YOU DID NOT CLOSE", self.__path
+            print "ERROR: YOU DID NOT CLOSE a", self.__class__.__name__
 
 
     def _write_block(self, block_type, data):
@@ -28,7 +29,7 @@ class TrxWriterBase(object):
         @param data: A dictionary of data to write.  Don't include class objects
         '''
         if self.__fh is None:
-            raise Exception("File %s is not open" % (self.__path))
+            raise Exception("File %s is not open")
 
         if data.has_key(self.K_TYPE):
             raise Exception("Can't use %s as a data key" % (self.K_TYPE))
@@ -41,3 +42,10 @@ class TrxWriterBase(object):
         if self.__fh is not None:
             self.__fh.close()
             self.__fh = None
+
+
+    def datetime_to_save(self, dt):
+        if dt is None:
+            return 'None'
+        return dt.strftime(self.DT_FORMAT)
+    
