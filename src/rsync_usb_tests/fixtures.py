@@ -32,8 +32,8 @@ class SampleTargetChunkData(object):
         self.gen_dir('home/nate/.ssh')
         self.gen_file('home/nate/contacts', size=1024)
         self.gen_dir('home/nate/pictures')
-        for i in range(100):
-            self.gen_file('home/nate/pictures/IMG_%03d.jpg' % (i), size=1024*1024)
+        for i in range(10):
+            self.gen_file('home/nate/pictures/IMG_%03d.jpg' % (i), size=4*1024)
         self.gen_file('home/nate/.ssh/authorized_keys', size=10)
         self.gen_file('home/nate/empty', size=0)
 

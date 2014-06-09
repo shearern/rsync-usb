@@ -35,6 +35,23 @@ class TargetHashesFile(object):
         return self.path
 
 
+    def __hash__(self):
+        return hash(str(self))
+
+
+    def __eq__(self, obj):
+        try:
+            if not self.path == obj.path:
+                return False
+            if not self._fileobj_type == obj._fileobj_type:
+                return False
+            return True
+        except AttributeError:
+            return NotImplemented
+
+
+
+
 class TargetHashesChunk(object):
     '''Hold data about a chunk of a file on the target system'''
     def __init__(self):
@@ -55,6 +72,19 @@ class TargetHashesChunk(object):
         else:
             msg = "chunk"
         return "%s[%s:%s]" % (msg, str(self.start_pos), str(self.end_pos))
+
+
+    def __eq__(self, obj):
+        try:
+            if not self.file_header == obj.file_header:
+                return False
+            if not self.start_pos == obj.start_pos:
+                return False
+            if not self.send_pos == obj.end_pos:
+                return False
+            return True
+        except AttributeError:
+            return NotImplemented
 
 
 class TargetHashesReader(TrxReaderBase):
