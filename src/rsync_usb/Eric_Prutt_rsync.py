@@ -134,7 +134,6 @@ def blockchecksums(instream, blocksize=4096):
     while read:
         weakhashes.append(weakchecksum(bytes(read))[0])
         stronghashes.append(hashlib.md5(read).hexdigest())
-        print "\t".join(['%-10s' % (read), str(weakhashes[-1]), stronghashes[-1]])
         read = instream.read(blocksize)
 
     return weakhashes, stronghashes
@@ -160,6 +159,8 @@ def rollingchecksum(removed, new, a, b, blocksize=4096):
     of the checksum calculation for the previous window, the removed
     byte, and the added byte.
     """
+    print "Rolling:    %09d, %09d" % (removed - new,
+                                      removed * blocksize - (removed - new))
     a -= removed - new
     b -= removed * blocksize - a
     return (b << 16) | a, a, b
@@ -174,5 +175,6 @@ def weakchecksum(data):
     for i in range(l):
         a += data[i]
         b += (l - i)*data[i]
+        print "1-time:     %09d, %09d" % (a, b)
 
     return (b << 16) | a, a, b
