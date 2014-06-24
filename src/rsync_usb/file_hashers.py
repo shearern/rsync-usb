@@ -3,14 +3,38 @@ import hashlib
 
 
 class RollingHashValue(object):
-    def __init__(self):
-        self.value = None
 
-        self._a = None
-        self._b = None
-        self._first = None      # First byte of data hashed
-        self._second = None
-        self._data_len = None
+    HALF_SIZE = pow(2, 16)
+
+    def __init__(self):
+        self.__a = None
+        self.__b = None
+
+        self.data_len = None
+        self.first_data = None      # First byte of data hashed
+        self.second_data = None
+
+
+    def get_a(self):
+        return self.__a
+    def set_a(self, v):
+        v = v % self.HALF_SIZE
+        self.__a = v
+    a = property(get_a, set_a)
+
+
+    def get_b(self):
+        return self.__b
+    def set_b(self, v):
+        v = v % self.HALF_SIZE
+        self.__b = v
+    b = property(get_b, set_b)
+
+
+    @property
+    def value(self):
+        return (self.__b << 16) | self.__a
+
 
 
 def calc_chunk_rolling_weak_hash(data, block_size, prev_hash=None):
@@ -30,44 +54,47 @@ def calc_chunk_rolling_weak_hash(data, block_size, prev_hash=None):
     '''
     # Init return data
     rtn = RollingHashValue()
-    rtn._data_len = len(data)
-    if rtn._data_len == 0:
+    rtn.data_len = len(data)
+    if rtn.data_len == 0:
         raise Exception("Can't hash empty data array")
-    rtn._first = data[0]
-    if rtn._data_len > 1:
-        rtn._second = data[1]
+    rtn.first_data = data[0]
+    if rtn.data_len > 1:
+        rtn.second_data = data[1]
 
     # Perform first hash
     if prev_hash is None:
-        rtn._a = 0
-        rtn._b = 0
+        a = 0
+        b = 0
 
-        for i in range(rtn._data_len):
-            rtn._a += ord(data[i])
-            rtn._b += (rtn._data_len - i)*ord(data[i])
+        for i in range(rtn.data_len):
+            a += ord(data[i])
+            b += (rtn.data_len - i)*ord(data[i])
 
-        rtn.value = (rtn._b << 16) | rtn._a
+        rtn.a = a
+        rtn.b = b
 
     # Perform update hash
     else:
-        if prev_hash._second is None:
+        if prev_hash.second_data is None:
             raise Exception("Previous data didn't have more data to hash...")
-        if prev_hash._second != rtn._first:
+        if prev_hash.second_data != rtn.first_data:
             msg = "New data doesn't appear to be one byte shifted from prev data"
             raise Exception(msg)
 
-        removed = ord(prev_hash._first)
+        removed = ord(prev_hash.first_data)
         new = ord(data[-1])
 
-        if prev_hash._data_len == rtn._data_len:
-            rtn._a = prev_hash._a - removed - new
-            rtn._b = prev_hash._b - (removed * block_size - rtn._a)
-            rtn.value = (rtn._b << 16) | rtn._a
-        elif prev_hash._data_len - 1 == rtn._data_len:
-            raise NotImplementedError()
+        # s(k+1, m+1)
+        if prev_hash.data_len == rtn.data_len:
+            rtn.a = prev_hash.a - removed + new
+            rtn.b = prev_hash.b - (prev_hash.data_len*removed) + rtn.a
+
+        # s(k+1, m)
+        elif prev_hash.data_len - 1 == rtn.data_len:
             new = None
-            rtn._a = prev_hash._a - removed
-            rtn._b = prev_hash._b - (removed * block_size - rtn._a)
+            rtn.a = prev_hash.a - removed
+            rtn.b = prev_hash.b - (prev_hash.data_len*removed)
+
         else:
             msg = "Previous block %d bytes, this block %d bytes"
             raise Exception(msg % (prev_hash._data_len, rtn._data_len))
