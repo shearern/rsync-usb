@@ -2,6 +2,7 @@ from TargetHashesWriter import TargetHashesWriter as THW
 
 from TrxReaderBase import TrxReaderBase
 from rsync_usb.ftree import DirInfo, FileInfo
+from rsync_usb.ChunkLocation import ChunkLocation
 
 class TargetHashesFileHeader(object):
     '''Hold data from target hashes file header'''
@@ -62,8 +63,7 @@ class TargetHashesChunk(object):
         self.strong_hash = None
         self.chunk_size = None
 
-        self.start_pos = None
-        self.end_pos = None
+        self.pos = None
 
 
     def __str__(self):
@@ -74,13 +74,20 @@ class TargetHashesChunk(object):
         return "%s[%s:%s]" % (msg, str(self.start_pos), str(self.end_pos))
 
 
+    @property
+    def start_pos(self):
+        return self.pos.start_pos
+
+    @property
+    def end_pos(self):
+        return self.pos.end_pos
+
+
     def __eq__(self, obj):
         try:
             if not self.file_header == obj.file_header:
                 return False
-            if not self.start_pos == obj.start_pos:
-                return False
-            if not self.send_pos == obj.end_pos:
+            if not self.pos == obj.pos:
                 return False
             return True
         except AttributeError:
@@ -170,12 +177,14 @@ class TargetHashesReader(TrxReaderBase):
             if data.chunk_size is None:
                 data.chunk_size = self.__scan_header.block_size
 
+            start_pos = None
             if self.__last_file_chunk is None:
-                data.start_pos = 0
+                start_pos = 0
             else:
-                data.start_pos = self.__last_file_chunk.end_pos + 1
+                start_pos = self.__last_file_chunk.end_pos + 1
 
-            data.end_pos = data.start_pos + data.chunk_size - 1
+            data.pos = ChunkLocation(data.file_header.path,
+                                     start_pos, data.chunk_size)
 
             self.__last_file_chunk = data
 
