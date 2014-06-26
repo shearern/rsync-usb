@@ -51,8 +51,6 @@ class TargetHashesFile(object):
             return NotImplemented
 
 
-
-
 class TargetHashesChunk(object):
     '''Hold data about a chunk of a file on the target system'''
     def __init__(self):
