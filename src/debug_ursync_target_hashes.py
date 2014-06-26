@@ -13,6 +13,13 @@ from rsync_usb.trx_files.TargetHashesReader import TargetHashesFileHeader
 from rsync_usb.trx_files.TargetHashesReader import TargetHashesFile
 from rsync_usb.trx_files.TargetHashesReader import TargetHashesChunk
 
+
+def make_header(num, title):
+    header = '-- Record %03i - %s ' % (num, title.upper())
+    header += '-' * (header_len-len(header))
+    return header
+
+
 def print_attrib(name, value):
     if value is None:
         value = '[None]'
@@ -52,9 +59,7 @@ if __name__ == '__main__':
 
             # -- HEADER -------------------------------------------------------
             if data.__class__ is TargetHashesFileHeader:
-                header = '-- Record %i -- %s ' % (i, "HEADER")
-                header += '-' * (header_len-len(header))
-                print header
+                print make_header(i, 'HEADER')
 
                 print_attrib('from_host', data.from_host)
                 print_attrib('created_at', data.created_at)
@@ -65,9 +70,7 @@ if __name__ == '__main__':
 
             # -- FILE_HEADER --------------------------------------------------
             elif data.__class__ is TargetHashesFile:
-                header = '-- Record %i -- %s ' % (i, "FILE HEADER")
-                header += '-' * (header_len-len(header))
-                print header
+                print make_header(i, 'FILE HEADER')
 
                 if data.scan_header is not None:
                     print_attrib('scan_header.from_host',
@@ -82,9 +85,7 @@ if __name__ == '__main__':
 
             # -- FILE_CHUNK ---------------------------------------------------
             elif data.__class__ is TargetHashesChunk:
-                header = '-- Record %i -- %s ' % (i, "FILE CHUNK")
-                header += '-' * (header_len-len(header))
-                print header
+                print make_header(i, 'FILE CHUNK HASHES')
 
                 if data.scan_header is not None:
                     print_attrib('scan_header.from_host',

@@ -34,8 +34,8 @@ gflags.DEFINE_integer(
     help = "Specify the block size to use when searching files for existing data",
     )
 
-from rsync_usb.target_cmd import do_target_cmd
-from rsync_usb.source_cmd import do_source_cmd
+from rsync_usb.cmds.TargetCommand import TargetCommand
+
 
 from rsync_usb.ui.ConsoleUI import ConsoleUI
 
@@ -65,13 +65,27 @@ if __name__ == '__main__':
     ui.inform_version()
 
     try:
+        cmd = None
         if gflags.FLAGS.target:
-            do_target_cmd(local_path, trx_path)
-        elif gflags.FLAGS.source:
-            do_source_cmd(local_path, trx_path)
+            cmd = TargetCommand(trx_path)
+#         elif gflags.FLAGS.source:
+#             do_source_cmd(local_path, trx_path)
         else:
             ui.abort("Nothing to do?")
             sys.exit(1)
+
+        if gflags.FLAGS.verbose:
+            cmd.opt_verbose = True
+
+        if gflags.FLAGS.list_files:
+            cmd.opt_list_files = True
+
+        if gflags.FLAGS.block_size is not None:
+            cmd.opt_default_block_size = int(gflags.FLAGS.block_size)
+
+        cmd.run(local_path)
+
+
     except ParameterError, e:
         ui.abort(str(e))
         sys.exit(1)

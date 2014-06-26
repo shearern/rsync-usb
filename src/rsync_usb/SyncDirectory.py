@@ -1,8 +1,11 @@
 import os
+import re
 
 from ParameterError import ParameterError
 
 from SyncSettings import SyncSettings
+
+from hostname import get_hostname
 
 class SyncDirectory(object):
     '''Wraps interaction with the sync directory
@@ -19,6 +22,7 @@ class SyncDirectory(object):
         @param path: Path to the sync directory
         '''
         self.__path = path
+        self.__this_hostname = get_hostname()
 
         if not os.path.exists(path):
             raise ParameterError("Transfer path does not exist: ", path)
@@ -40,4 +44,22 @@ class SyncDirectory(object):
 
     def write_sync_settings(self, settings):
         settings.write(self.sync_settings_path)
+
+
+    def get_target_hash_file_path_for_self(self):
+        '''Get path to the file to write target hashes to'''
+        return os.path.join(self.__path,
+                            'target_hashes.%s.dat' % (self.__this_hostname))
+
+
+    TARGET_HASH_PATH_PAT = re.compile(r'^target_hashes.(.*).dat$')
+    def list_existing_target_hash_files(self):
+        '''List the target hash files that exist in the sync directory
+
+        @return generator: (hostname, path)
+        '''
+        for filename in os.listdir(self.__path):
+            m = self.TARGET_HASH_PATH_PAT.match(filename)
+            if m:
+                yield m.group(1), os.path.join(self.__path, filename)
 
