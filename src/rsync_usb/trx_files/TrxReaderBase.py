@@ -95,7 +95,12 @@ class TrxReaderBase(object):
             return None
 
         # Read next data dict from disk
-        data = self.__depickler.load()
+        data = None
+        try:
+            data = self.__depickler.load()
+        except EOFError:
+            raise StopIteration()
+
 
         # Interpret Type
         type_key = TrxWriterBase.K_TYPE
