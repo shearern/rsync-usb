@@ -35,7 +35,7 @@ gflags.DEFINE_integer(
     )
 
 from rsync_usb.cmds.TargetCommand import TargetCommand
-
+from rsync_usb.cmds.SourceCommand import SourceCommand
 
 from rsync_usb.ui.ConsoleUI import ConsoleUI
 
@@ -68,8 +68,8 @@ if __name__ == '__main__':
         cmd = None
         if gflags.FLAGS.target:
             cmd = TargetCommand(trx_path)
-#         elif gflags.FLAGS.source:
-#             do_source_cmd(local_path, trx_path)
+        elif gflags.FLAGS.source:
+            cmd = SourceCommand(trx_path)
         else:
             ui.abort("Nothing to do?")
             sys.exit(1)

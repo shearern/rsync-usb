@@ -58,6 +58,11 @@ class TargetChunkMemoryIndexTests(unittest.TestCase):
 
         self.assertEqual(len(found), 1)
         self.assertEqual(found[0], self.chunks[0])
+        
+        
+    # TODO: has_inplace_match
+    
+    # TODO: 
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ from CommandBase import CommandBase
 class TargetCommand(CommandBase):
 
     def __init__(self, trx_path=None):
+        super(TargetCommand, self).__init__()
         if trx_path is not None:
             self.set_trx_path(trx_path)
 
